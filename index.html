@@ -6,7 +6,7 @@
   <title>Warehouse Inventory Map</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/lucide-react@0.344.0/dist/umd/lucide-react.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,8 +17,46 @@
   <div id="root"></div>
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useMemo, useRef, useCallback } = React;
-    const { Plus, AlertTriangle, Trash2, Download, RotateCcw, Search, DoorOpen, Hash, ChevronRight, RotateCw, Upload, CheckCircle, FileText } = lucide;
 
+    // Helper: create React components from lucide icon data
+    function createLucideIcon(iconData) {
+      return function LucideIcon({ size = 24, color = "currentColor", strokeWidth = 2, className = "", ...props }) {
+        return React.createElement('svg', {
+          xmlns: "http://www.w3.org/2000/svg",
+          width: size,
+          height: size,
+          viewBox: "0 0 24 24",
+          fill: "none",
+          stroke: color,
+          strokeWidth: strokeWidth,
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          className: className,
+          ...props
+        }, ...iconData.map((item, i) => {
+          if (Array.isArray(item)) {
+            const [tag, attrs] = item;
+            return React.createElement(tag, { key: i, ...attrs });
+          }
+          return null;
+        }).filter(Boolean));
+      };
+    }
+    // Create all needed icon components
+    const Plus = createLucideIcon(lucide.Plus);
+    const AlertTriangle = createLucideIcon(lucide.AlertTriangle || lucide.TriangleAlert);
+    const Trash2 = createLucideIcon(lucide.Trash2);
+    const Download = createLucideIcon(lucide.Download);
+    const RotateCcw = createLucideIcon(lucide.RotateCcw);
+    const Search = createLucideIcon(lucide.Search);
+    const DoorOpen = createLucideIcon(lucide.DoorOpen);
+    const Hash = createLucideIcon(lucide.Hash);
+    const ChevronRight = createLucideIcon(lucide.ChevronRight);
+    const RotateCw = createLucideIcon(lucide.RotateCw);
+    const Upload = createLucideIcon(lucide.Upload);
+    const CheckCircle = createLucideIcon(lucide.CheckCircle || lucide.CircleCheck);
+    const FileText = createLucideIcon(lucide.FileText);
+  
 
 
 // ============================================================
