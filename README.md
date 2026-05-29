@@ -1,2 +1,0 @@
-# Inventory
-Current Product Inventory
