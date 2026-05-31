@@ -7,7 +7,7 @@ import {
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';       // user fills in
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // user fills in
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpZmJqbHBrZm9qbWpta2xvaGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MzU2MTUsImV4cCI6MjA5NTMxMTYxNX0.HDX3qPpH3CkCr1J9fmqFCOgY2nO1wmB5GYqMceaipZY';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
