@@ -7,8 +7,47 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-Wl6DiP2g.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-m_zK7LdY.css">
+  <script type="module" crossorigin src="/assets/index-tj6-a103.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DfCRcynr.css">
+  <style>
+    /* ── Auth / Onboarding UI polish ── */
+
+    /* Pill-shaped submit button */
+    form button[type="submit"] {
+      border-radius: 9999px !important;
+      padding-top: 13px !important;
+      padding-bottom: 13px !important;
+      font-size: 15px !important;
+      letter-spacing: 0.01em !important;
+      transition: opacity 0.15s, transform 0.1s !important;
+    }
+    form button[type="submit"]:not(:disabled):hover {
+      opacity: 0.88 !important;
+    }
+    form button[type="submit"]:not(:disabled):active {
+      transform: scale(0.97) !important;
+    }
+
+    /* Softer rounded inputs */
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="text"] {
+      border-radius: 12px !important;
+      padding: 12px 16px !important;
+      font-size: 14px !important;
+    }
+
+    /* Card max-width cap and centering */
+    .min-h-screen.flex.items-center > div {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* Slightly softer card corners */
+    .bg-slate-900.border.border-slate-800.rounded-xl {
+      border-radius: 18px !important;
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
