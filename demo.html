@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Warehouse Demo — Loading...</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f1623;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #e2e8f0;
+    }
+    .logo { margin-bottom: 24px; opacity: 0.9; }
+    .title { font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #f8d57a; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: #94a3b8; margin-bottom: 32px; }
+    .bar-wrap { width: 220px; height: 4px; background: #1e2d40; border-radius: 99px; overflow: hidden; }
+    .bar { height: 100%; width: 0; background: #f8d57a; border-radius: 99px; transition: width 0.4s ease; }
+    .msg { margin-top: 14px; font-size: 13px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <svg viewBox="0 0 80 80" width="72" height="72" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="16" fill="#1e2d40"/>
+      <g transform="translate(12,12)" fill="none" stroke="#f8d57a" stroke-width="3.5">
+        <rect x="0" y="0" width="16" height="16" rx="2"/>
+        <rect x="24" y="0" width="16" height="16" rx="2"/>
+        <rect x="48" y="0" width="16" height="16" rx="2"/>
+        <rect x="0" y="24" width="16" height="16" rx="2"/>
+        <rect x="24" y="24" width="16" height="16" rx="2" fill="#f8d57a" fill-opacity="0.25"/>
+        <rect x="48" y="24" width="16" height="16" rx="2"/>
+        <rect x="0" y="48" width="16" height="16" rx="2"/>
+        <rect x="24" y="48" width="16" height="16" rx="2"/>
+        <rect x="48" y="48" width="16" height="16" rx="2" fill="#f8d57a" fill-opacity="0.25"/>
+      </g>
+    </svg>
+  </div>
+  <div class="title">WAREHOUSE</div>
+  <div class="subtitle">Inventory Dashboard — Demo Mode</div>
+  <div class="bar-wrap"><div class="bar" id="bar"></div></div>
+  <div class="msg" id="msg">Loading demo data…</div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'warehouse_v3:pallets';
+
+      // ── Demo pallet dataset ──────────────────────────────────────────
+      // ~55 pallets spread across a 16×16 warehouse grid.
+      // Rows 0 & 15 cols 7-8 are doors — no pallets placed there.
+      const now = Date.now();
+      function pid(i) { return `demo_${i}_${now}`; }
+
+      const pallets = [
+        // ── Row 1 (index 1) — Milk Replacer block ───────────────────
+        { id: pid(1),  number: 1,  row: 1, col: 0,  stack_label: 'A', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 48, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(2),  number: 2,  row: 1, col: 0,  stack_label: 'B', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 48, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(3),  number: 3,  row: 1, col: 1,  stack_label: 'A', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(4),  number: 4,  row: 1, col: 1,  stack_label: 'B', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(5),  number: 5,  row: 1, col: 1,  stack_label: 'C', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(6),  number: 6,  row: 1, col: 2,  stack_label: 'A', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 46, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(7),  number: 7,  row: 1, col: 2,  stack_label: 'B', lot: 'MR-2024-041', blend: 'Milk Replacer',       quantity: 46, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(8),  number: 8,  row: 1, col: 3,  stack_label: 'A', lot: 'MR-2024-042', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 1, status: 'active',  tag: 'PRIORITY', notes: 'Truck out Friday' },
+
+        // ── Row 2 — Magnum Milk Replacer ─────────────────────────────
+        { id: pid(9),  number: 9,  row: 2, col: 0,  stack_label: 'A', lot: 'MMR-2024-018', blend: 'Magnum Milk Replacer', quantity: 40, units: 'bags',  stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(10), number: 10, row: 2, col: 0,  stack_label: 'B', lot: 'MMR-2024-018', blend: 'Magnum Milk Replacer', quantity: 40, units: 'bags',  stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(11), number: 11, row: 2, col: 1,  stack_label: 'A', lot: 'MMR-2024-018', blend: 'Magnum Milk Replacer', quantity: 44, units: 'bags',  stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(12), number: 12, row: 2, col: 1,  stack_label: 'B', lot: 'MMR-2024-018', blend: 'Magnum Milk Replacer', quantity: 44, units: 'bags',  stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(13), number: 13, row: 2, col: 1,  stack_label: 'C', lot: 'MMR-2024-018', blend: 'Magnum Milk Replacer', quantity: 44, units: 'bags',  stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(14), number: 14, row: 2, col: 2,  stack_label: 'A', lot: 'MMR-2024-019', blend: 'Magnum Milk Replacer', quantity: 48, units: 'bags',  stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(15), number: 15, row: 2, col: 2,  stack_label: 'B', lot: 'MMR-2024-019', blend: 'Magnum Milk Replacer', quantity: 48, units: 'bags',  stack_height: 2, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 3 — Bucket Products (Gold Medal, Eliminator) ─────────
+        { id: pid(16), number: 16, row: 3, col: 4,  stack_label: 'A', lot: 'BP-2024-077', blend: 'Gold Medal 25#',       quantity: 60, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(17), number: 17, row: 3, col: 4,  stack_label: 'B', lot: 'BP-2024-077', blend: 'Gold Medal 25#',       quantity: 60, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(18), number: 18, row: 3, col: 5,  stack_label: 'A', lot: 'BP-2024-077', blend: 'Gold Medal 50#',       quantity: 36, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(19), number: 19, row: 3, col: 5,  stack_label: 'B', lot: 'BP-2024-077', blend: 'Gold Medal 50#',       quantity: 36, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(20), number: 20, row: 3, col: 6,  stack_label: 'A', lot: 'BP-2024-079', blend: 'Eliminator 25#',       quantity: 72, units: 'buckets', stack_height: 1, status: 'active',  tag: '',         notes: '' },
+        { id: pid(21), number: 21, row: 3, col: 9,  stack_label: 'A', lot: 'BP-2024-079', blend: 'Eliminator 50#',       quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(22), number: 22, row: 3, col: 9,  stack_label: 'B', lot: 'BP-2024-079', blend: 'Eliminator 50#',       quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 4 — Immunizer + HPVM ──────────────────────────────────
+        { id: pid(23), number: 23, row: 4, col: 10, stack_label: 'A', lot: 'BP-2024-081', blend: 'Immunizer 44#',        quantity: 48, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(24), number: 24, row: 4, col: 10, stack_label: 'B', lot: 'BP-2024-081', blend: 'Immunizer 44#',        quantity: 48, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(25), number: 25, row: 4, col: 11, stack_label: 'A', lot: 'BP-2024-082', blend: 'HPVM 25#',             quantity: 60, units: 'buckets', stack_height: 1, status: 'active',  tag: '',         notes: '' },
+        { id: pid(26), number: 26, row: 4, col: 12, stack_label: 'A', lot: 'BP-2024-082', blend: 'HPVM 50#',             quantity: 42, units: 'buckets', stack_height: 2, status: 'active',  tag: 'HOLD',     notes: 'Awaiting QC sign-off' },
+        { id: pid(27), number: 27, row: 4, col: 12, stack_label: 'B', lot: 'BP-2024-082', blend: 'HPVM 50#',             quantity: 42, units: 'buckets', stack_height: 2, status: 'active',  tag: 'HOLD',     notes: 'Awaiting QC sign-off' },
+
+        // ── Row 5 — Magnum-Lac + RFA ──────────────────────────────────
+        { id: pid(28), number: 28, row: 5, col: 13, stack_label: 'A', lot: 'BP-2024-085', blend: 'Magnum-Lac 25#',       quantity: 66, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(29), number: 29, row: 5, col: 13, stack_label: 'B', lot: 'BP-2024-085', blend: 'Magnum-Lac 25#',       quantity: 66, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(30), number: 30, row: 5, col: 14, stack_label: 'A', lot: 'BP-2024-085', blend: 'RFA 50#',              quantity: 48, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(31), number: 31, row: 5, col: 14, stack_label: 'B', lot: 'BP-2024-085', blend: 'RFA 50#',              quantity: 48, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(32), number: 32, row: 5, col: 14, stack_label: 'C', lot: 'BP-2024-085', blend: 'RFA 50#',              quantity: 48, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(33), number: 33, row: 5, col: 15, stack_label: 'A', lot: 'BP-2024-086', blend: 'RFA-5 25#',            quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(34), number: 34, row: 5, col: 15, stack_label: 'B', lot: 'BP-2024-086', blend: 'RFA-5 25#',            quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 7 — Top Calf + First Aid ─────────────────────────────
+        { id: pid(35), number: 35, row: 7, col: 0,  stack_label: 'A', lot: 'BP-2024-090', blend: 'Top Calf 25#',         quantity: 72, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(36), number: 36, row: 7, col: 0,  stack_label: 'B', lot: 'BP-2024-090', blend: 'Top Calf 25#',         quantity: 72, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(37), number: 37, row: 7, col: 1,  stack_label: 'A', lot: 'BP-2024-091', blend: 'First Aid 10#',         quantity: 80, units: 'buckets', stack_height: 1, status: 'active',  tag: '',         notes: '' },
+        { id: pid(38), number: 38, row: 7, col: 2,  stack_label: 'A', lot: 'BP-2024-091', blend: 'First Aid 25#',         quantity: 60, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(39), number: 39, row: 7, col: 2,  stack_label: 'B', lot: 'BP-2024-091', blend: 'First Aid 25#',         quantity: 60, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 8 — Magnum Calf Aide ──────────────────────────────────
+        { id: pid(40), number: 40, row: 8, col: 4,  stack_label: 'A', lot: 'BP-2024-093', blend: 'Magnum Calf Aide 25#', quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(41), number: 41, row: 8, col: 4,  stack_label: 'B', lot: 'BP-2024-093', blend: 'Magnum Calf Aide 25#', quantity: 54, units: 'buckets', stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(42), number: 42, row: 8, col: 5,  stack_label: 'A', lot: 'BP-2024-093', blend: 'Magnum Calf Aide 50#', quantity: 36, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(43), number: 43, row: 8, col: 5,  stack_label: 'B', lot: 'BP-2024-093', blend: 'Magnum Calf Aide 50#', quantity: 36, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+        { id: pid(44), number: 44, row: 8, col: 5,  stack_label: 'C', lot: 'BP-2024-093', blend: 'Magnum Calf Aide 50#', quantity: 36, units: 'buckets', stack_height: 3, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 10 — More Milk Replacer (new lot) ─────────────────────
+        { id: pid(45), number: 45, row: 10, col: 6, stack_label: 'A', lot: 'MR-2024-043', blend: 'Milk Replacer',        quantity: 50, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(46), number: 46, row: 10, col: 6, stack_label: 'B', lot: 'MR-2024-043', blend: 'Milk Replacer',        quantity: 50, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(47), number: 47, row: 10, col: 7, stack_label: 'A', lot: 'MR-2024-043', blend: 'Milk Replacer',        quantity: 50, units: 'bags',    stack_height: 1, status: 'active',  tag: '',         notes: '' },
+        { id: pid(48), number: 48, row: 10, col: 8, stack_label: 'A', lot: 'MR-2024-043', blend: 'Milk Replacer',        quantity: 48, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(49), number: 49, row: 10, col: 8, stack_label: 'B', lot: 'MR-2024-043', blend: 'Milk Replacer',        quantity: 48, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+
+        // ── Row 12 — Old / bad pallets (flagged red) ──────────────────
+        { id: pid(50), number: 50, row: 12, col: 11, stack_label: 'A', lot: 'MR-2023-098', blend: 'Milk Replacer',       quantity: 32, units: 'bags',    stack_height: 1, status: 'old_bad', tag: 'DAMAGED',  notes: 'Water damage — do not ship' },
+        { id: pid(51), number: 51, row: 12, col: 12, stack_label: 'A', lot: 'MMR-2023-055', blend: 'Magnum Milk Replacer', quantity: 20, units: 'bags',  stack_height: 1, status: 'old_bad', tag: 'EXPIRED',  notes: 'Past best-by date' },
+        { id: pid(52), number: 52, row: 12, col: 13, stack_label: 'A', lot: 'BP-2023-112',  blend: 'Eliminator 25#',      quantity: 18, units: 'buckets', stack_height: 1, status: 'old_bad', tag: 'EXPIRED',  notes: 'Old lot — quarantined' },
+
+        // ── Row 14 — Mixed overflow near east door ────────────────────
+        { id: pid(53), number: 53, row: 14, col: 0,  stack_label: 'A', lot: 'MR-2024-044', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(54), number: 54, row: 14, col: 0,  stack_label: 'B', lot: 'MR-2024-044', blend: 'Milk Replacer',       quantity: 50, units: 'bags',    stack_height: 2, status: 'active',  tag: '',         notes: '' },
+        { id: pid(55), number: 55, row: 14, col: 1,  stack_label: 'A', lot: 'MMR-2024-020', blend: 'Magnum Milk Replacer', quantity: 44, units: 'bags',  stack_height: 1, status: 'active',  tag: 'PRIORITY', notes: 'Outbound Monday' },
+      ];
+
+      // ── Inject into localStorage ───────────────────────────────────
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pallets));
+      } catch (e) {
+        console.error('Could not write demo data to localStorage:', e);
+      }
+
+      // ── Animate progress bar and redirect ─────────────────────────
+      const bar = document.getElementById('bar');
+      const msg = document.getElementById('msg');
+      const steps = [
+        [15, 'Loading product catalog…'],
+        [40, 'Placing pallets…'],
+        [70, 'Rendering warehouse grid…'],
+        [95, 'Almost ready…'],
+      ];
+
+      let i = 0;
+      function tick() {
+        if (i < steps.length) {
+          bar.style.width = steps[i][0] + '%';
+          msg.textContent = steps[i][1];
+          i++;
+          setTimeout(tick, 280);
+        } else {
+          bar.style.width = '100%';
+          msg.textContent = 'Launching app…';
+          setTimeout(() => { window.location.href = 'index.html'; }, 200);
+        }
+      }
+      setTimeout(tick, 100);
+    })();
+  </script>
+</body>
+</html>
